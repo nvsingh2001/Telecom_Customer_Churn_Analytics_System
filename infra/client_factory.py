@@ -23,9 +23,15 @@ class AWSClientFactory:
             self._redshift = self.__session_secondary.client(
                 "redshift", region_name=self.region
             )
+            self._redshift_data = self.__session_secondary.client(
+                "redshift-data", region_name=self.region
+            )
 
     def get_s3_client(self):
         return self._s3
 
     def get_redshift_client(self):
         return self._redshift
+
+    def get_redshift_data_client(self):
+        return self._redshift_data

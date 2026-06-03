@@ -4,6 +4,9 @@ class S3Manager:
         self.bucket_name = bucket_name
 
     def upload_file(self, file_path):
-        with open(file_path, "rb") as f:
-            file_name = "raw/" + file_path.split("/")[-1]
-            self.s3_client.upload_fileobj(f, self.bucket_name, file_name)
+        try:
+            with open(file_path, "rb") as f:
+                file_name = "raw/" + file_path.split("/")[-1]
+                self.s3_client.upload_fileobj(f, self.bucket_name, file_name)
+        except Exception as e:
+            print(f"[Error] Failed to upload file : {e}")

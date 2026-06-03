@@ -1,6 +1,6 @@
 from .base import Command
 from infra import provision_services
-from services import S3Manager
+from services import S3Manager, RedshiftManager
 import os
 
 
@@ -40,3 +40,32 @@ class UploadCommand(Command):
             print("[Success] Data uploaded successfully!")
         except Exception as e:
             print(f"[Error] Data upload failed: {e}")
+
+
+class CreateTableCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Create Redshift Database Tables"
+
+    def __init__(self, redshift_manager: RedshiftManager):
+        self.redshift_manager = redshift_manager
+
+    def execute(self) -> None:
+        from config import (
+            REDSHIFT_CLUSTER_IDENTIFIER,
+            REDSHIFT_DBNAME,
+            REDSHIFT_MASTER_USERNAME,
+        )
+
+        sql_file_path = "sql/create_tables.sql"
+        print(f"\n[Creating] Starting table creation from {sql_file_path}...")
+        try:
+            self.redshift_manager.execute_sql_file(
+                cluster_identifier=REDSHIFT_CLUSTER_IDENTIFIER,
+                database_name=REDSHIFT_DBNAME,
+                user_name=REDSHIFT_MASTER_USERNAME,
+                file_path=sql_file_path,
+            )
+            print("[Success] SQL execution completed (check Redshift for status)!")
+        except Exception as e:
+            print(f"[Error] Table creation failed: {e}")

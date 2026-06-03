@@ -153,7 +153,7 @@ class VerifyDataCommand(Command):
             REDSHIFT_MASTER_USERNAME,
         )
 
-        tables = ["customer_churn", "zip_population"]
+        tables = ["customer_churn", "zip_population", "customer_analytics"]
 
         for table in tables:
             print(f"\n[Verifying] Checking row count for {table}...")
@@ -177,3 +177,32 @@ class VerifyDataCommand(Command):
                     print(f"\n[Error] Could not verify {table}.")
             except Exception as e:
                 print(f"[Error] Verification failed for {table}: {e}")
+
+
+class CreateAnalyticalTableCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Create Final Analytical Table"
+
+    def __init__(self, redshift_manager: RedshiftManager):
+        self.redshift_manager = redshift_manager
+
+    def execute(self) -> None:
+        from config import (
+            REDSHIFT_CLUSTER_IDENTIFIER,
+            REDSHIFT_DBNAME,
+            REDSHIFT_MASTER_USERNAME,
+        )
+
+        sql_file_path = "sql/create_analytical_table.sql"
+        print(f"\n[Creating] Creating analytical table from {sql_file_path}...")
+        try:
+            self.redshift_manager.execute_sql_file(
+                cluster_identifier=REDSHIFT_CLUSTER_IDENTIFIER,
+                database_name=REDSHIFT_DBNAME,
+                user_name=REDSHIFT_MASTER_USERNAME,
+                file_path=sql_file_path,
+            )
+            print("[Success] Analytical table created successfully!")
+        except Exception as e:
+            print(f"[Error] Analytical table creation failed: {e}")

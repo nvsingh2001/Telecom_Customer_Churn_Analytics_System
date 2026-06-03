@@ -206,3 +206,72 @@ class CreateAnalyticalTableCommand(Command):
             print("[Success] Analytical table created successfully!")
         except Exception as e:
             print(f"[Error] Analytical table creation failed: {e}")
+
+
+class DataAnalysisCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Perform Data Analysis"
+
+    def __init__(self, redshift_manager: RedshiftManager):
+        self.redshift_manager = redshift_manager
+
+    def execute(self) -> None:
+        from config import (
+            REDSHIFT_CLUSTER_IDENTIFIER,
+            REDSHIFT_DBNAME,
+            REDSHIFT_MASTER_USERNAME,
+        )
+        from utils import print_table, format_redshift_records
+
+        analysis_options = {
+            "1": ("Churn Rate Across All Customers", "sql/analysis/churn_rate.sql"),
+            "2": (
+                "Top Cities with Highest Churn",
+                "sql/analysis/top_churn_cities.sql",
+            ),
+            "3": ("Churn Distribution by Tenure", "sql/analysis/churn_by_tenure.sql"),
+            "4": ("Total Revenue Lost to Churn", "sql/analysis/revenue_lost.sql"),
+            "5": ("Population vs Customer Count", "sql/analysis/pop_vs_cust_count.sql"),
+        }
+
+        print("\nSelect Analysis to Perform:")
+        for key, (label, _) in analysis_options.items():
+            print(f"{key}. {label}")
+        print(f"{len(analysis_options) + 1}. Back to Main Menu")
+
+        choice = input("Choice: ").strip()
+        if choice == str(len(analysis_options) + 1):
+            return
+
+        if choice not in analysis_options:
+            print("[Error] Invalid selection.")
+            return
+
+        label, sql_file = analysis_options[choice]
+        print(f"\n[Analyzing] {label}...")
+
+        try:
+            with open(sql_file, "r") as f:
+                sql = f.read()
+
+            response = self.redshift_manager.execute_statement(
+                cluster_identifier=REDSHIFT_CLUSTER_IDENTIFIER,
+                database_name=REDSHIFT_DBNAME,
+                user_name=REDSHIFT_MASTER_USERNAME,
+                sql=sql,
+            )
+
+            statement_id = response["Id"]
+            if self.redshift_manager.wait_for_statement(statement_id):
+                result = self.redshift_manager.get_statement_result(statement_id)
+                if result is None:
+                    print(f"[Error] Analysis failed for: {label}")
+                    return
+                headers = [col["name"] for col in result.get("ColumnMetadata", [])]
+                rows = format_redshift_records(result)
+                print_table(headers, rows)
+            else:
+                print(f"[Error] Analysis failed for: {label}")
+        except Exception as e:
+            print(f"[Error] Analysis execution failed: {e}")

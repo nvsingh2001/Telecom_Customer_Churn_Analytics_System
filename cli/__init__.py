@@ -8,6 +8,7 @@ from .commands import (
     VerifyDataCommand,
     CreateAnalyticalTableCommand,
     DataAnalysisCommand,
+    MaintenanceCommand,
 )
 
 
@@ -21,4 +22,5 @@ __all__ = [
     "VerifyDataCommand",
     "CreateAnalyticalTableCommand",
     "DataAnalysisCommand",
+    "MaintenanceCommand",
 ]

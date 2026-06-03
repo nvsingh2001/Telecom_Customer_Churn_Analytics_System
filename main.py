@@ -6,6 +6,7 @@ from cli import (
     VerifyDataCommand,
     CreateAnalyticalTableCommand,
     DataAnalysisCommand,
+    MaintenanceCommand,
     MenuController,
 )
 from infra import AWSClientFactory
@@ -38,6 +39,7 @@ def main():
         VerifyDataCommand(redshift_manager=redshift_manager),
         CreateAnalyticalTableCommand(redshift_manager=redshift_manager),
         DataAnalysisCommand(redshift_manager=redshift_manager),
+        MaintenanceCommand(redshift_manager=redshift_manager),
     ]
 
     menu = MenuController(commands)

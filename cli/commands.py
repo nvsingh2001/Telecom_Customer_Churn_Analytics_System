@@ -275,3 +275,34 @@ class DataAnalysisCommand(Command):
                 print(f"[Error] Analysis failed for: {label}")
         except Exception as e:
             print(f"[Error] Analysis execution failed: {e}")
+
+
+class MaintenanceCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Perform Redshift Maintenance (VACUUM & ANALYZE)"
+
+    def __init__(self, redshift_manager: RedshiftManager):
+        self.redshift_manager = redshift_manager
+
+    def execute(self) -> None:
+        from config import (
+            REDSHIFT_CLUSTER_IDENTIFIER,
+            REDSHIFT_DBNAME,
+            REDSHIFT_MASTER_USERNAME,
+        )
+
+        sql_file_path = "sql/maintenance.sql"
+        print(f"\n[Maintenance] Starting Redshift maintenance from {sql_file_path}...")
+        print("[Note] This may take several minutes depending on data volume.")
+        
+        try:
+            self.redshift_manager.execute_sql_file(
+                cluster_identifier=REDSHIFT_CLUSTER_IDENTIFIER,
+                database_name=REDSHIFT_DBNAME,
+                user_name=REDSHIFT_MASTER_USERNAME,
+                file_path=sql_file_path,
+            )
+            print("[Success] Maintenance operations completed successfully!")
+        except Exception as e:
+            print(f"[Error] Maintenance failed: {e}")

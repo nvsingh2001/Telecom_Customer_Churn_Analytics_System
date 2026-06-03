@@ -71,12 +71,7 @@ class RedshiftManager:
             print(f"[Error] Failed to describe statement: {err}")
 
     def get_statement_result(self, statement_id):
-        """
-        Gets the result of a SQL statement.
-
-        :param statement_id: The SQL statement identifier.
-        :return: The SQL statement result.
-        """
+        # ... (existing code)
         try:
             result = {
                 "Records": [],
@@ -89,6 +84,30 @@ class RedshiftManager:
             return result
         except ClientError as err:
             print(f"[Error] Failed to get statement result: {err}")
+
+    def wait_for_statement(self, statement_id):
+        """
+        Polls for the completion of a statement.
+
+        :param statement_id: The statement identifier.
+        :return: True if finished, False if failed/aborted.
+        """
+        import time
+
+        while True:
+            desc = self.describe_statement(statement_id)
+            if desc is None:
+                return False
+            status = desc["Status"]
+            if status == "FINISHED":
+                return True
+            elif status in ["FAILED", "ABORTED"]:
+                error_msg = desc.get("Error", "No error message provided.")
+                print(f"\n[Error] Query {status}: {error_msg}")
+                return False
+
+            print(".", end="", flush=True)
+            time.sleep(2)
 
     def execute_sql_file(self, cluster_identifier, database_name, user_name, file_path):
         """

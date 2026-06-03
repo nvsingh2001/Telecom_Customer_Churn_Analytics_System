@@ -1,16 +1,46 @@
+-- Expanded Staging Table to match the full 38-column CSV
 CREATE TABLE IF NOT EXISTS customer_churn (
     customer_id VARCHAR(50) PRIMARY KEY,
-    gender VARCHAR(10),
+    gender VARCHAR(20),
     age INT,
+    married VARCHAR(10),
+    number_of_dependents INT,
     city VARCHAR(100),
-    zip_code VARCHAR(10),
+    zip_code VARCHAR(20),
+    latitude DECIMAL(10, 6),
+    longitude DECIMAL(10, 6),
+    number_of_referrals INT,
     tenure INT,
+    offer VARCHAR(50),
+    phone_service VARCHAR(10),
+    avg_long_distance_charges DECIMAL(10, 2),
+    multiple_lines VARCHAR(10),
+    internet_service VARCHAR(10),
+    internet_type VARCHAR(20),
+    avg_gb_download INT,
+    online_security VARCHAR(10),
+    online_backup VARCHAR(10),
+    device_protection VARCHAR(10),
+    premium_support VARCHAR(10),
+    streaming_tv VARCHAR(10),
+    streaming_movies VARCHAR(10),
+    streaming_music VARCHAR(10),
+    unlimited_data VARCHAR(10),
+    contract VARCHAR(20),
+    paperless_billing VARCHAR(10),
+    payment_method VARCHAR(50),
     monthly_charges DECIMAL(10, 2),
     total_charges DECIMAL(10, 2),
-    customer_status VARCHAR(20)
+    total_refunds DECIMAL(10, 2),
+    total_extra_data_charges DECIMAL(10, 2),
+    total_long_distance_charges DECIMAL(10, 2),
+    total_revenue DECIMAL(10, 2),
+    customer_status VARCHAR(20),
+    churn_category VARCHAR(50),
+    churn_reason VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS zip_population (
-    zip_code VARCHAR(10) PRIMARY KEY,
+    zip_code VARCHAR(20) PRIMARY KEY,
     population INT
 );

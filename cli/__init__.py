@@ -1,6 +1,13 @@
 from .base import Command
 from .menu import MenuController
-from .commands import DeployCommand, UploadCommand, CreateTableCommand
+from .commands import (
+    DeployCommand,
+    UploadCommand,
+    CreateTableCommand,
+    LoadDataCommand,
+    VerifyDataCommand,
+)
+
 
 __all__ = [
     "Command",
@@ -8,4 +15,6 @@ __all__ = [
     "DeployCommand",
     "UploadCommand",
     "CreateTableCommand",
+    "LoadDataCommand",
+    "VerifyDataCommand",
 ]

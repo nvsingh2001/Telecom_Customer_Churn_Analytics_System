@@ -7,10 +7,12 @@ from cli import (
     CreateAnalyticalTableCommand,
     DataAnalysisCommand,
     MaintenanceCommand,
+    PauseClusterCommand,
+    ResumeClusterCommand,
     MenuController,
 )
 from infra import AWSClientFactory
-from services import S3Manager, RedshiftManager
+from services import S3Manager, RedshiftManager, RedshiftClusterManager
 from config import (
     REGION,
     BUCKET_NAME,
@@ -30,6 +32,7 @@ def main():
 
     s3_manager = S3Manager(s3_client=factory.get_s3_client(), bucket_name=BUCKET_NAME)
     redshift_manager = RedshiftManager(client=factory.get_redshift_data_client())
+    cluster_manager = RedshiftClusterManager(client=factory.get_redshift_client())
 
     commands = [
         DeployCommand(factory=factory),
@@ -40,6 +43,8 @@ def main():
         CreateAnalyticalTableCommand(redshift_manager=redshift_manager),
         DataAnalysisCommand(redshift_manager=redshift_manager),
         MaintenanceCommand(redshift_manager=redshift_manager),
+        PauseClusterCommand(cluster_manager=cluster_manager),
+        ResumeClusterCommand(cluster_manager=cluster_manager),
     ]
 
     menu = MenuController(commands)

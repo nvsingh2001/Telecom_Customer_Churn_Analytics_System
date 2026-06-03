@@ -71,7 +71,12 @@ class RedshiftManager:
             print(f"[Error] Failed to describe statement: {err}")
 
     def get_statement_result(self, statement_id):
-        # ... (existing code)
+        """
+        Gets the result of a SQL statement.
+
+        :param statement_id: The SQL statement identifier.
+        :return: The SQL statement result.
+        """
         try:
             result = {
                 "Records": [],

@@ -9,6 +9,8 @@ from .commands import (
     CreateAnalyticalTableCommand,
     DataAnalysisCommand,
     MaintenanceCommand,
+    PauseClusterCommand,
+    ResumeClusterCommand,
 )
 
 
@@ -23,4 +25,6 @@ __all__ = [
     "CreateAnalyticalTableCommand",
     "DataAnalysisCommand",
     "MaintenanceCommand",
+    "PauseClusterCommand",
+    "ResumeClusterCommand",
 ]

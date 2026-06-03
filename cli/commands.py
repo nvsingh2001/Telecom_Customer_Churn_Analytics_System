@@ -1,6 +1,6 @@
 from .base import Command
 from infra import provision_services
-from services import S3Manager, RedshiftManager
+from services import S3Manager, RedshiftManager, RedshiftClusterManager
 import os
 
 
@@ -295,7 +295,7 @@ class MaintenanceCommand(Command):
         sql_file_path = "sql/maintenance.sql"
         print(f"\n[Maintenance] Starting Redshift maintenance from {sql_file_path}...")
         print("[Note] This may take several minutes depending on data volume.")
-        
+
         try:
             self.redshift_manager.execute_sql_file(
                 cluster_identifier=REDSHIFT_CLUSTER_IDENTIFIER,
@@ -306,3 +306,49 @@ class MaintenanceCommand(Command):
             print("[Success] Maintenance operations completed successfully!")
         except Exception as e:
             print(f"[Error] Maintenance failed: {e}")
+
+
+class PauseClusterCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Pause Redshift Cluster (Stop Costs)"
+
+    def __init__(self, cluster_manager: RedshiftClusterManager):
+        self.cluster_manager = cluster_manager
+
+    def execute(self) -> None:
+        from config import REDSHIFT_CLUSTER_IDENTIFIER
+
+        status = self.cluster_manager.get_cluster_status(REDSHIFT_CLUSTER_IDENTIFIER)
+        if status != "available":
+            print(f"[Note] Cluster is currently '{status}'. Cannot pause.")
+            return
+
+        try:
+            self.cluster_manager.pause_cluster(REDSHIFT_CLUSTER_IDENTIFIER)
+            print("[Success] Pause request submitted successfully!")
+        except Exception as e:
+            print(f"[Error] Failed to submit pause request: {e}")
+
+
+class ResumeClusterCommand(Command):
+    @property
+    def name(self) -> str:
+        return "Resume Redshift Cluster (Start Costs)"
+
+    def __init__(self, cluster_manager: RedshiftClusterManager):
+        self.cluster_manager = cluster_manager
+
+    def execute(self) -> None:
+        from config import REDSHIFT_CLUSTER_IDENTIFIER
+
+        status = self.cluster_manager.get_cluster_status(REDSHIFT_CLUSTER_IDENTIFIER)
+        if status != "paused":
+            print(f"[Note] Cluster is currently '{status}'. Cannot resume.")
+            return
+
+        try:
+            self.cluster_manager.resume_cluster(REDSHIFT_CLUSTER_IDENTIFIER)
+            print("[Success] Resume request submitted successfully!")
+        except Exception as e:
+            print(f"[Error] Failed to submit resume request: {e}")

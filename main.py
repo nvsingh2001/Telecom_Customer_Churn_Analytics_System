@@ -1,23 +1,22 @@
 from cli import DeployCommand, UploadCommand, MenuController
 from infra import AWSClientFactory
-from dotenv import load_dotenv
-import os
-
 from services import S3Manager
-
-
-load_dotenv()
-REGION = os.getenv("REGION")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
+from config import REGION, BUCKET_NAME, PROFILE_MAIN, PROFILE_SECONDARY
 
 
 def main():
-    factory = AWSClientFactory(region=REGION)
+    factory = AWSClientFactory(
+        **{
+            "region": REGION,
+            "profile_main": PROFILE_MAIN,
+            "profile_secondary": PROFILE_SECONDARY,
+        }
+    )
 
     s3_manager = S3Manager(s3_client=factory.get_s3_client(), bucket_name=BUCKET_NAME)
 
     commands = [
-        DeployCommand(factory=factory, bucket_name=BUCKET_NAME),
+        DeployCommand(factory=factory),
         UploadCommand(S3Manager=s3_manager),
     ]
 

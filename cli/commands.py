@@ -9,14 +9,13 @@ class DeployCommand(Command):
     def name(self) -> str:
         return "Deploy Infrastructure"
 
-    def __init__(self, factory, bucket_name):
+    def __init__(self, factory):
         self.factory = factory
-        self.bucket_name = bucket_name
 
     def execute(self) -> None:
         print("\n[Provisioning] Starting AWS service deployment...")
         try:
-            provision_services(self.factory, self.bucket_name)
+            provision_services(self.factory)
             print("[Success] Infrastructure deployed successfully!")
         except Exception as e:
             print(f"[Error] Deployment failed: {e}")
